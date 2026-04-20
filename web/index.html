@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Kiro Proxy 管理面板</title>
+<link rel="stylesheet" href="/admin/css/style.css">
+</head>
+<body>
+<div id="app">
+<nav class="navbar">
+  <div class="nav-brand">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+    Kiro Proxy
+  </div>
+  <div class="nav-tabs">
+    <button class="tab active" onclick="switchTab('accounts')">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      账号
+    </button>
+    <button class="tab" onclick="switchTab('keys')">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+      密钥
+    </button>
+    <button class="tab" onclick="switchTab('proxies')">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+      代理
+    </button>
+    <button class="tab" onclick="switchTab('usage')">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      用量
+    </button>
+    <button class="tab" onclick="switchTab('models')">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/></svg>
+      模型
+    </button>
+    <button class="tab" onclick="switchTab('settings')">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      设置
+    </button>
+  </div>
+</nav>
+
+<main class="content">
+  <!-- 实时监控条 -->
+  <div id="metrics-bar" style="display:flex;gap:16px;align-items:center;padding:10px 16px;margin-bottom:12px;background:linear-gradient(135deg,#1e1b4b,#312e81);border-radius:10px;color:#e0e7ff;font-size:12px;flex-wrap:wrap">
+    <div style="display:flex;align-items:center;gap:6px;font-weight:600;color:#a5b4fc">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+      实时
+    </div>
+    <div class="metric-item"><span class="metric-val" id="m-rpm">0</span><span class="metric-lbl">次/分</span></div>
+    <div class="metric-item"><span class="metric-val" id="m-rps">0</span><span class="metric-lbl">次/秒</span></div>
+    <div class="metric-item"><span class="metric-val" id="m-active">0</span><span class="metric-lbl">并发</span></div>
+    <div class="metric-item"><span class="metric-val" id="m-queued">0</span><span class="metric-lbl">排队</span></div>
+    <div style="width:1px;height:20px;background:#4338ca"></div>
+    <div class="metric-item"><span class="metric-val" id="m-in-s">0</span><span class="metric-lbl">输入/秒</span></div>
+    <div class="metric-item"><span class="metric-val" id="m-out-s">0</span><span class="metric-lbl">输出/秒</span></div>
+    <div style="width:1px;height:20px;background:#4338ca"></div>
+    <div class="metric-item"><span class="metric-val" id="m-in-m">0</span><span class="metric-lbl">输入/分</span></div>
+    <div class="metric-item"><span class="metric-val" id="m-out-m">0</span><span class="metric-lbl">输出/分</span></div>
+    <div style="flex:1"></div>
+    <div class="metric-item"><span class="metric-val" id="m-total">0</span><span class="metric-lbl">总请求</span></div>
+    <div class="metric-item"><span class="metric-val" id="m-uptime">0s</span><span class="metric-lbl">运行</span></div>
+    <div style="width:1px;height:20px;background:#4338ca"></div>
+    <button id="cache-toggle-btn" onclick="toggleCache()" style="background:#4338ca;border:1px solid #6366f1;color:#e0e7ff;padding:3px 10px;border-radius:6px;font-size:11px;cursor:pointer">缓存: --</button>
+  </div>
+  <!-- 积分汇总条 -->
+  <div id="credits-bar" style="display:none;gap:16px;align-items:center;padding:8px 16px;margin-bottom:12px;background:linear-gradient(135deg,#1a1a2e,#16213e);border-radius:10px;color:#e0e7ff;font-size:12px;flex-wrap:wrap">
+    <div style="display:flex;align-items:center;gap:6px;font-weight:600;color:#c084fc">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><path d="M12 18V6"/></svg>
+      积分
+    </div>
+    <div class="metric-item"><span class="metric-val" id="m-credits-used" style="color:#c084fc">-</span><span class="metric-lbl">已消耗</span></div>
+    <div class="metric-item"><span class="metric-val" id="m-credits-limit" style="color:#60a5fa">-</span><span class="metric-lbl">总额度</span></div>
+    <div class="metric-item"><span class="metric-val" id="m-credits-remaining" style="color:#34d399">-</span><span class="metric-lbl">剩余</span></div>
+    <div style="flex:1"></div>
+    <div id="credits-progress" style="min-width:120px;display:flex;align-items:center;gap:8px">
+      <div style="flex:1;height:6px;background:#374151;border-radius:3px;overflow:hidden">
+        <div id="credits-progress-bar" style="width:0%;height:100%;border-radius:3px;transition:width .5s;background:#10b981"></div>
+      </div>
+      <span id="credits-pct" style="font-size:11px;color:#9ca3af">-</span>
+    </div>
+  </div>
+  <!-- 迷你折线图 -->
+  <div style="margin-bottom:12px">
+    <canvas id="metrics-chart" height="60" style="width:100%;background:#1e1b4b;border-radius:8px"></canvas>
+  </div>
+  <div id="panel-accounts" class="panel active">
+    <div class="stats-grid" id="accounts-stats"></div>
+    <div class="toolbar">
+      <button class="btn btn-primary" onclick="showAddAccountModal()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        添加账号
+      </button>
+      <button class="btn btn-success" onclick="refreshAllTokens()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+        刷新全部Token
+      </button>
+      <button class="btn btn-outline" onclick="queryAllUsageLimits()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        查询全部用量
+      </button>
+      <button class="btn btn-outline" onclick="exportAccounts()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        导出
+      </button>
+      <button class="btn btn-outline" onclick="document.getElementById('import-file').click()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        导入
+      </button>
+      <input type="file" id="import-file" accept=".json" style="display:none" onchange="importAccounts(event)">
+    </div>
+    <div class="card">
+      <table>
+        <thead><tr><th>邮箱</th><th>状态</th><th>并发</th><th>最近请求</th><th>统计</th><th>用量</th><th>代理</th><th>详情</th><th>操作</th></tr></thead>
+        <tbody id="accounts-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div id="panel-keys" class="panel">
+    <div class="toolbar">
+      <button class="btn btn-primary" onclick="showCreateKeyModal()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        创建密钥
+      </button>
+    </div>
+    <div class="card">
+      <table>
+        <thead><tr><th>名称</th><th>密钥</th><th>描述</th><th>状态</th><th>速率限制</th><th>使用次数</th><th>最后使用</th><th>操作</th></tr></thead>
+        <tbody id="keys-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div id="panel-proxies" class="panel">
+    <div class="toolbar">
+      <button class="btn btn-primary" onclick="showAddProxyModal()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        添加代理
+      </button>
+      <button class="btn btn-success" onclick="testAllProxies()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        测试全部
+      </button>
+    </div>
+    <div id="proxy-test-results"></div>
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-title">前置代理 (Pre-Proxy)</div>
+      <p class="text-muted" style="font-size:13px;margin-bottom:12px">当 SOCKS5 代理无法直连时，通过本地前置代理建立链式连接。留空则直连 SOCKS5。</p>
+      <div style="display:flex;gap:8px;align-items:center">
+        <input id="pre-proxy-input" type="text" placeholder="例如: http://127.0.0.1:7897" style="flex:1">
+        <button class="btn btn-primary" onclick="savePreProxy()">保存</button>
+        <button class="btn btn-outline" onclick="clearPreProxy()">清除</button>
+      </div>
+      <div id="pre-proxy-status" style="margin-top:8px;font-size:12px"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">代理池</div>
+      <p class="text-muted" style="font-size:13px;margin-bottom:12px">配置 HTTP/SOCKS5 代理，用于 Token 刷新和 API 请求。支持按用途分配。</p>
+      <table>
+        <thead><tr><th>名称</th><th>地址</th><th>类型</th><th>绑定</th><th>出口IP/延迟</th><th>成功</th><th>失败</th><th>状态</th><th>操作</th></tr></thead>
+        <tbody id="proxies-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div id="panel-usage" class="panel">
+    <div class="stats-grid" id="usage-stats"></div>
+    <div class="card">
+      <div class="card-title">按模型统计</div>
+      <table>
+        <thead><tr><th>模型</th><th>请求数</th><th>成功</th><th>失败</th><th>输入Token</th><th>输出Token</th></tr></thead>
+        <tbody id="usage-model-tbody"></tbody>
+      </table>
+    </div>
+    <div class="card">
+      <div class="card-title" style="display:flex;align-items:center;justify-content:space-between">
+        <span>请求日志</span>
+        <button id="log-auto-btn" class="btn btn-sm btn-outline" onclick="toggleLogPolling()" style="font-size:11px;padding:2px 10px">自动刷新: 关</button>
+      </div>
+      <table>
+        <thead><tr><th>时间</th><th>会话</th><th>模型</th><th>账号</th><th>请求内容</th><th>响应内容</th><th>Token</th><th>耗时</th><th>状态</th><th>操作</th></tr></thead>
+        <tbody id="request-logs-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div id="panel-models" class="panel">
+    <div class="model-layout">
+      <div class="model-sidebar">
+        <div class="model-sidebar-title">可用模型</div>
+        <div id="add-model-box" style="display:none" class="model-add-box">
+          <input type="text" id="new-model-input" placeholder="输入模型名">
+          <button class="btn btn-sm btn-primary" onclick="addKiroModel()">添加</button>
+          <button class="btn btn-sm btn-outline" onclick="hideAddModelInput()" style="padding:4px 8px">✕</button>
+        </div>
+        <div id="kiro-models-sidebar"></div>
+        <button class="btn btn-sm btn-outline" onclick="showAddModelInput()" style="width:100%;margin-top:8px;justify-content:center">+ 添加模型</button>
+      </div>
+      <div class="model-main">
+        <div id="model-detail-header"></div>
+        <div id="model-detail-content">
+          <div class="model-main-empty">← 选择模型查看账号分配</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="panel-settings" class="panel">
+    <div class="card">
+      <div class="card-title">请求限速配置</div>
+      <p class="text-muted" style="font-size:13px;margin-bottom:16px">通过限制请求频率降低账号封禁风险。修改后立即生效并自动持久化。</p>
+      <div id="ratelimit-form">
+        <div style="margin-bottom:16px">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+            <input type="checkbox" id="rl-enabled" onchange="saveRateLimitSettings()">
+            <span style="font-weight:600">启用请求限速</span>
+          </label>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+          <div>
+            <label class="form-label">每账号最小请求间隔 (秒)</label>
+            <input type="number" id="rl-min-interval" class="form-input" step="0.1" min="0" placeholder="0.5">
+            <div class="text-muted" style="font-size:12px;margin-top:4px">两次请求之间的最短等待时间</div>
+          </div>
+          <div>
+            <label class="form-label">每账号每分钟最大请求数</label>
+            <input type="number" id="rl-max-rpm" class="form-input" min="1" placeholder="60">
+            <div class="text-muted" style="font-size:12px;margin-top:4px">单个账号每分钟允许的最大请求数</div>
+          </div>
+          <div>
+            <label class="form-label">全局每分钟最大请求数</label>
+            <input type="number" id="rl-global-rpm" class="form-input" min="1" placeholder="120">
+            <div class="text-muted" style="font-size:12px;margin-top:4px">所有账号合计每分钟允许的最大请求数</div>
+          </div>
+          <div>
+            <label class="form-label">配额冷却时间 (秒)</label>
+            <input type="number" id="rl-cooldown" class="form-input" min="0" placeholder="30">
+            <div class="text-muted" style="font-size:12px;margin-top:4px">触发限流后的冷却等待时间</div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px">
+          <div>
+            <label class="form-label">重试超时 (秒)</label>
+            <input type="number" id="rl-retry-timeout" class="form-input" min="1" placeholder="60">
+            <div class="text-muted" style="font-size:12px;margin-top:4px">单次请求最大重试时长</div>
+          </div>
+          <div>
+            <label class="form-label">429 后延迟 (秒)</label>
+            <input type="number" id="rl-429-delay" class="form-input" step="0.5" min="0" placeholder="0">
+            <div class="text-muted" style="font-size:12px;margin-top:4px">0 = 立即重试，收到429后等多久</div>
+          </div>
+          <div>
+            <label class="form-label">最大重试次数</label>
+            <input type="number" id="rl-max-attempts" class="form-input" min="1" placeholder="100">
+            <div class="text-muted" style="font-size:12px;margin-top:4px">同一请求最多重试多少次</div>
+          </div>
+          <div>
+            <label class="form-label">错误重试间隔 (秒)</label>
+            <input type="number" id="rl-error-delay" class="form-input" step="0.5" min="0" placeholder="1">
+            <div class="text-muted" style="font-size:12px;margin-top:4px">收到 5xx 等错误后等待多久再重试</div>
+          </div>
+          <div>
+            <label class="form-label">账号冷却阈值 (次)</label>
+            <input type="number" id="rl-cd-threshold" class="form-input" min="1" placeholder="10">
+            <div class="text-muted" style="font-size:12px;margin-top:4px">连续多少次非429错误后账号进入冷却</div>
+          </div>
+          <div>
+            <label class="form-label">连接超时 (秒)</label>
+            <input type="number" id="rl-connect-timeout" class="form-input" min="1" placeholder="15">
+            <div class="text-muted" style="font-size:12px;margin-top:4px">TCP+TLS连接超时，超时断开释放资源</div>
+          </div>
+        </div>
+        <div style="margin-top:16px">
+          <button class="btn btn-primary" onclick="saveRateLimitSettings()">保存配置</button>
+          <button class="btn btn-outline" onclick="loadSettings()" style="margin-left:8px">刷新</button>
+        </div>
+      </div>
+    </div>
+    <div class="card" style="margin-top:16px">
+      <div class="card-title">实时限流状态</div>
+      <div id="ratelimit-stats"></div>
+    </div>
+    <div class="card" style="margin-top:16px">
+      <div class="card-title">账号并发限制</div>
+      <div class="card-body">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:end">
+          <div>
+            <label class="form-label">每个账号最大并发请求数</label>
+            <input type="number" id="max-concurrent" class="form-input" min="1" max="20" placeholder="2">
+            <div class="text-muted" style="font-size:12px;margin-top:4px">每个 Kiro 账号同时处理的最大请求数（1-20），设置后对所有账号生效</div>
+          </div>
+          <div>
+            <button class="btn btn-primary" onclick="saveConcurrentSettings()">保存并发设置</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card" style="margin-top:16px">
+      <div class="card-title">🔤 模型名清理规则</div>
+      <p class="text-muted" style="font-size:13px;margin-bottom:12px">从传入的模型名中删除指定字符串，每行一条规则。例如添加 "-thinking" 会将 "claude-opus-4-5-thinking" 清理为 "claude-opus-4-5"。</p>
+      <textarea id="model-strip-patterns" rows="5" style="width:100%;padding:8px 12px;border:1px solid #d1d5db;border-radius:6px;font-family:monospace;font-size:13px;resize:vertical" placeholder="每行一条，例如：&#10;-thinking&#10;-20251101"></textarea>
+      <div style="margin-top:8px">
+        <button class="btn btn-primary" onclick="saveModelStripPatterns()">保存规则</button>
+        <button class="btn btn-outline" onclick="loadModelStripPatterns()" style="margin-left:8px">刷新</button>
+        <span id="model-strip-status" style="margin-left:12px;font-size:12px"></span>
+      </div>
+    </div>
+    <div class="card" style="margin-top:16px">
+      <div class="card-title">🔀 模型名映射</div>
+      <p class="text-muted" style="font-size:13px;margin-bottom:12px">将客户传入的模型名映射到实际的 Kiro 模型名。每行一条，格式: 传入名=实际名。不区分大小写。</p>
+      <textarea id="model-aliases" rows="6" style="width:100%;padding:8px 12px;border:1px solid #d1d5db;border-radius:6px;font-family:monospace;font-size:13px;resize:vertical" placeholder="每行一条，例如：&#10;claude-sonnet-4-5=claude-sonnet-4.5&#10;claude-haiku-4-5=claude-haiku-4.5&#10;gpt-4o=claude-sonnet-4.5"></textarea>
+      <div style="margin-top:8px">
+        <button class="btn btn-primary" onclick="saveModelAliases()">保存映射</button>
+        <button class="btn btn-outline" onclick="loadModelAliases()" style="margin-left:8px">刷新</button>
+      </div>
+    </div>
+    <div class="card" style="margin-top:16px">
+      <div class="card-title">💬 自动回复规则</div>
+      <div class="card-body">
+        <p style="color:#666;margin-bottom:12px;font-size:13px">当用户消息匹配关键词时，直接返回自定义回复，不消耗 Kiro 额度。</p>
+        <div id="auto-reply-list"></div>
+        <div style="margin-top:12px;padding:12px;border:1px solid #e5e7eb;border-radius:8px;background:#f9fafb">
+          <div style="display:grid;grid-template-columns:1fr 2fr auto auto;gap:8px;align-items:end">
+            <div>
+              <label class="form-label" style="font-size:12px">关键词</label>
+              <input type="text" id="ar-keyword" class="form-input" placeholder="例: 你是什么模型">
+            </div>
+            <div>
+              <label class="form-label" style="font-size:12px">回复内容</label>
+              <input type="text" id="ar-reply" class="form-input" placeholder="例: 我是 Claude Sonnet 4.5">
+            </div>
+            <div>
+              <label class="form-label" style="font-size:12px">匹配方式</label>
+              <select id="ar-exact" class="form-input" style="width:auto">
+                <option value="false">包含匹配</option>
+                <option value="true">精确匹配</option>
+              </select>
+            </div>
+            <div>
+              <button class="btn btn-primary" onclick="addAutoReply()" style="margin-top:20px">添加</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+</div>
+
+<div id="modal-container"></div>
+
+<script src="/admin/js/api.js"></script>
+<script src="/admin/js/status.js"></script>
+<script src="/admin/js/accounts.js"></script>
+<script src="/admin/js/keys.js"></script>
+<script src="/admin/js/proxies.js"></script>
+<script src="/admin/js/usage.js"></script>
+<script src="/admin/js/settings.js"></script>
+<script src="/admin/js/models.js"></script>
+<script src="/admin/js/auto_reply.js"></script>
+<script src="/admin/js/app.js"></script>
+</body>
+</html>

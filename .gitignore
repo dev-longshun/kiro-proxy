@@ -1,0 +1,6 @@
+*.db
+*.log
+*.7z
+crash.log
+kiro-proxy
+kiro-proxy-linux
