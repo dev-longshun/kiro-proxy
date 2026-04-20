@@ -157,6 +157,12 @@ func (s *Server) authMiddleware(next http.Handler) http.Handler {
 				next.ServeHTTP(w, r)
 				return
 			}
+			// Allow requests from admin UI (same-origin referer)
+			referer := r.Header.Get("Referer")
+			if referer != "" && strings.Contains(referer, "/admin") {
+				next.ServeHTTP(w, r)
+				return
+			}
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(401)
 			json.NewEncoder(w).Encode(map[string]interface{}{
