@@ -407,6 +407,7 @@ function showAddAccountModal() {
     '<div style="display:flex;gap:8px;margin-bottom:12px">' +
       '<button class="btn btn-sm btn-outline" onclick="switchAddMode(\'simple\')" id="add-mode-simple" style="border-color:#60a5fa">简单模式</button>' +
       '<button class="btn btn-sm btn-outline" onclick="switchAddMode(\'json\')" id="add-mode-json">JSON模式</button>' +
+      '<button class="btn btn-sm btn-outline" onclick="switchAddMode(\'kam\')" id="add-mode-kam">KAM导入</button>' +
     '</div>' +
     '<div id="add-simple">' +
       '<label>Access Token *</label><input type="text" id="m-token" placeholder="粘贴access_token">' +
@@ -418,17 +419,160 @@ function showAddAccountModal() {
       '<label>粘贴完整 Credentials JSON</label>' +
       '<textarea id="m-creds-json" rows="8" placeholder=\'{"clientId":"...","clientSecret":"...","accessToken":"...","refreshToken":"..."}\'></textarea>' +
     '</div>' +
-    '<label>邮箱</label><input type="text" id="m-email" placeholder="可选">' +
-    '<label>昵称</label><input type="text" id="m-nick" placeholder="可选">' +
+    '<div id="add-kam" style="display:none">' +
+      '<div id="kam-drop-zone" style="border:2px dashed #4b5563;border-radius:8px;padding:32px 16px;text-align:center;cursor:pointer;transition:border-color .2s,background .2s">' +
+        '<p style="margin:0;color:#9ca3af">拖拽 KAM JSON 文件到此处，或点击选择文件</p>' +
+        '<input type="file" id="kam-file-input" accept=".json" style="display:none">' +
+      '</div>' +
+      '<label style="margin-top:12px;display:block">或直接粘贴 JSON</label>' +
+      '<textarea id="kam-json-area" rows="6" placeholder=\'{"version":"1.0.0","accounts":[...]}\'></textarea>' +
+      '<div id="kam-preview" style="margin-top:8px;color:#9ca3af;font-size:13px"></div>' +
+    '</div>' +
+    '<div id="kam-extra-fields">' +
+      '<label>邮箱</label><input type="text" id="m-email" placeholder="可选">' +
+      '<label>昵称</label><input type="text" id="m-nick" placeholder="可选">' +
+    '</div>' +
     '<div class="modal-actions"><button class="btn btn-outline" onclick="closeModal()">取消</button>' +
-    '<button class="btn btn-primary" onclick="addAccount()">添加</button></div></div></div>';
+    '<button class="btn btn-primary" id="add-account-btn" onclick="addAccount()">添加</button></div></div></div>';
+  initKamDropZone();
 }
 
 function switchAddMode(mode) {
   document.getElementById('add-simple').style.display = mode === 'simple' ? '' : 'none';
   document.getElementById('add-json').style.display = mode === 'json' ? '' : 'none';
+  document.getElementById('add-kam').style.display = mode === 'kam' ? '' : 'none';
   document.getElementById('add-mode-simple').style.borderColor = mode === 'simple' ? '#60a5fa' : '';
   document.getElementById('add-mode-json').style.borderColor = mode === 'json' ? '#60a5fa' : '';
+  document.getElementById('add-mode-kam').style.borderColor = mode === 'kam' ? '#60a5fa' : '';
+  // KAM 模式隐藏邮箱/昵称字段，显示导入按钮
+  document.getElementById('kam-extra-fields').style.display = mode === 'kam' ? 'none' : '';
+  var btn = document.getElementById('add-account-btn');
+  btn.textContent = mode === 'kam' ? '导入' : '添加';
+  btn.setAttribute('onclick', mode === 'kam' ? 'handleKamImport()' : 'addAccount()');
+}
+
+function initKamDropZone() {
+  setTimeout(function() {
+    var zone = document.getElementById('kam-drop-zone');
+    var fileInput = document.getElementById('kam-file-input');
+    var textarea = document.getElementById('kam-json-area');
+    if (!zone) return;
+
+    zone.addEventListener('click', function() { fileInput.click(); });
+
+    zone.addEventListener('dragover', function(e) {
+      e.preventDefault();
+      zone.style.borderColor = '#60a5fa';
+      zone.style.background = 'rgba(96,165,250,0.05)';
+    });
+    zone.addEventListener('dragleave', function() {
+      zone.style.borderColor = '#4b5563';
+      zone.style.background = '';
+    });
+    zone.addEventListener('drop', function(e) {
+      e.preventDefault();
+      zone.style.borderColor = '#4b5563';
+      zone.style.background = '';
+      var file = e.dataTransfer.files[0];
+      if (file) readKamFile(file);
+    });
+
+    fileInput.addEventListener('change', function() {
+      if (fileInput.files[0]) readKamFile(fileInput.files[0]);
+    });
+
+    textarea.addEventListener('input', function() {
+      updateKamPreview(textarea.value);
+    });
+  }, 0);
+}
+
+function readKamFile(file) {
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var text = e.target.result;
+    document.getElementById('kam-json-area').value = text;
+    updateKamPreview(text);
+  };
+  reader.readAsText(file);
+}
+
+function updateKamPreview(text) {
+  var preview = document.getElementById('kam-preview');
+  if (!text.trim()) { preview.textContent = ''; return; }
+  try {
+    var accounts = parseKamJson(text);
+    preview.style.color = '#34d399';
+    preview.textContent = '检测到 ' + accounts.length + ' 个账号';
+  } catch(e) {
+    preview.style.color = '#f87171';
+    preview.textContent = '解析失败: ' + e.message;
+  }
+}
+
+function parseKamJson(text) {
+  var data = JSON.parse(text);
+  var items = [];
+
+  if (data.accounts && Array.isArray(data.accounts)) {
+    items = data.accounts;
+  } else if (Array.isArray(data)) {
+    items = data;
+  } else if (data.credentials) {
+    items = [data];
+  } else if (data.refreshToken || data.accessToken || data.clientId) {
+    items = [{ credentials: data }];
+  } else {
+    throw new Error('无法识别的 JSON 格式');
+  }
+
+  var result = [];
+  for (var i = 0; i < items.length; i++) {
+    var item = items[i];
+    var creds = item.credentials || item;
+    if (!creds.refreshToken && !creds.accessToken) continue;
+    var acc = {};
+    if (creds.clientId) acc.clientId = creds.clientId;
+    if (creds.clientSecret) acc.clientSecret = creds.clientSecret;
+    if (creds.accessToken) acc.accessToken = creds.accessToken;
+    if (creds.refreshToken) acc.refreshToken = creds.refreshToken;
+    if (creds.region) acc.region = creds.region;
+    if (item.email) acc.email = item.email;
+    if (item.machineId) acc.machineId = item.machineId;
+    if (item.nickname) acc.nickname = item.nickname;
+    result.push(acc);
+  }
+  if (result.length === 0) throw new Error('未找到有效账号');
+  return result;
+}
+
+async function handleKamImport() {
+  var textarea = document.getElementById('kam-json-area');
+  var text = textarea.value.trim();
+  if (!text) { toast('请先拖入文件或粘贴 JSON', 'error'); return; }
+
+  var accounts;
+  try {
+    accounts = parseKamJson(text);
+  } catch(e) {
+    toast('解析失败: ' + e.message, 'error');
+    return;
+  }
+
+  var r = await api('/api/accounts', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(accounts)
+  });
+  if (r && r.ok) {
+    var msg = '导入成功: ' + (r.imported || 0) + ' 个账号';
+    if (r.skipped) msg += '，跳过 ' + r.skipped + ' 个重复';
+    toast(msg);
+    closeModal();
+    loadAccounts();
+  } else {
+    toast(r?.error || '导入失败', 'error');
+  }
 }
 
 async function addAccount() {
