@@ -559,11 +559,16 @@ async function handleKamImport() {
     return;
   }
 
+  console.log('[KAM] 准备导入', accounts.length, '个账号, payload:', JSON.stringify(accounts, null, 2));
+
   var r = await api('/api/accounts', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(accounts)
   });
+
+  console.log('[KAM] 响应:', JSON.stringify(r));
+
   if (r && r.ok) {
     var msg = '导入成功: ' + (r.imported || 0) + ' 个账号';
     if (r.skipped) msg += '，跳过 ' + r.skipped + ' 个重复';
@@ -571,7 +576,9 @@ async function handleKamImport() {
     closeModal();
     loadAccounts();
   } else {
-    toast(r?.error || '导入失败', 'error');
+    var errMsg = (r && r.error) ? r.error : '导入失败（无响应）';
+    if (r && r.status) errMsg += ' [HTTP ' + r.status + ']';
+    toast(errMsg, 'error');
   }
 }
 

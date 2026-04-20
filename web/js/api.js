@@ -12,7 +12,14 @@ function toast(msg, type) {
 async function api(path, opts) {
   try {
     const r = await fetch(BASE + path, opts);
-    if (!r.ok) return null;
+    if (!r.ok) {
+      try {
+        const errBody = await r.json();
+        return { _httpError: true, status: r.status, error: errBody.error || ('HTTP ' + r.status) };
+      } catch(e) {
+        return { _httpError: true, status: r.status, error: 'HTTP ' + r.status };
+      }
+    }
     return await r.json();
   } catch (e) {
     // 静默处理轮询接口的错误
