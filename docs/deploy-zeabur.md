@@ -1,42 +1,32 @@
 # Zeabur 部署指南
 
-## 构建镜像
+## 镜像地址
 
-```bash
-docker build -t kiro-proxy:latest .
 ```
-
-推送到你的镜像仓库（以 GitHub Container Registry 为例）：
-
-```bash
-docker tag kiro-proxy:latest ghcr.io/<你的用户名>/kiro-proxy:latest
-docker push ghcr.io/<你的用户名>/kiro-proxy:latest
+ghcr.io/dev-longshun/kiro-proxy:latest
 ```
 
 ## 部署步骤
 
 ### 1. 创建 MySQL 服务
 
-Add Service → Prebuilt Image → `mysql:8.4`
+Add Service → Marketplace → MySQL
 
-设置环境变量：
-
-- `MYSQL_ROOT_PASSWORD`：`rabbitcode`
-- `MYSQL_DATABASE`：`kiro_proxy`
+Zeabur 会自动生成连接变量，记下 `MYSQL_HOST`、`MYSQL_PORT`、`MYSQL_PASSWORD`。
 
 ### 2. 创建 Redis 服务（可选）
 
-Add Service → Prebuilt Image → `redis:7-alpine`
+Add Service → Marketplace → Redis
 
-不需要额外配置。如果不部署 Redis，kiro-proxy 会自动降级为内存缓存。
+不部署 Redis 也行，kiro-proxy 会自动降级为内存缓存。
 
 ### 3. 创建 kiro-proxy 服务
 
-Add Service → Prebuilt Image → 输入你的镜像地址
+Add Service → Prebuilt Image → 输入上方镜像地址
 
 ### 4. 设置环境变量
 
-在 kiro-proxy 服务中添加环境变量：
+在 kiro-proxy 服务的 Variables 中添加：
 
 | 变量 | 值 | 说明 |
 |------|-----|------|
@@ -47,70 +37,31 @@ Add Service → Prebuilt Image → 输入你的镜像地址
 Command：
 
 ```
-/app/kiro-proxy -port 8989 -mysql "root:rabbitcode@tcp(mysql.zeabur.internal:3306)/kiro_proxy?charset=utf8mb4&parseTime=true&loc=Local" -redis "redis://redis.zeabur.internal:6379"
+/app/kiro-proxy -port 8989 -mysql "${MYSQL_USERNAME}:${MYSQL_PASSWORD}@tcp(${MYSQL_HOST}:${MYSQL_PORT})/kiro_proxy?charset=utf8mb4&parseTime=true&loc=Local" -redis "redis://${REDIS_HOST}:${REDIS_PORT}"
 ```
 
-> MySQL/Redis 的内部域名根据你在 Zeabur 中创建的服务名而定，格式为 `<服务名>.zeabur.internal`。
+> 使用 Zeabur 的变量引用语法，会自动注入同项目内 MySQL/Redis 服务的连接信息。
 
 ### 6. 开放网络端口
 
 在 Networking 中开放端口 `8989`
-
-## Docker Compose 本地部署（备选）
-
-如果你想在自己的服务器上用 Docker Compose 部署：
-
-```yaml
-services:
-  mysql:
-    image: mysql:8.4
-    environment:
-      MYSQL_ROOT_PASSWORD: rabbitcode
-      MYSQL_DATABASE: kiro_proxy
-    volumes:
-      - mysql_data:/var/lib/mysql
-    restart: unless-stopped
-
-  redis:
-    image: redis:7-alpine
-    restart: unless-stopped
-
-  kiro-proxy:
-    build: .
-    ports:
-      - "8989:8989"
-    environment:
-      - API_KEY=你的密钥
-    command:
-      - -port=8989
-      - -mysql=root:rabbitcode@tcp(mysql:3306)/kiro_proxy?charset=utf8mb4&parseTime=true&loc=Local
-      - -redis=redis://redis:6379
-    depends_on:
-      - mysql
-      - redis
-    restart: unless-stopped
-
-volumes:
-  mysql_data:
-```
-
-启动：
-
-```bash
-docker compose up -d
-```
 
 ## 不需要配置的项
 
 - **持久化卷** — 数据存在 MySQL 中，kiro-proxy 本身无状态
 - **Dockerfile** — 预构建镜像部署不适用
 
+## 版本标签
+
+- `latest` — 打 `v*` tag 时更新（正式版本）
+- `beta` — 每次推送到 `main` 分支时更新
+
 ## 常见问题
 
 ### 数据库连接失败
 
-确认 MySQL 服务已启动且内部域名正确。Zeabur 中可在 MySQL 服务的 Networking 标签页查看内部地址。
+确认 MySQL 服务已创建且在同一个 Project 内。Zeabur 的变量引用需要服务间在同一项目才能互相发现。
 
 ### 启动后无账号
 
-正常现象。访问 `http://<你的域名>/admin` 通过管理后台添加账号。
+正常现象。访问 `https://<你的域名>/admin` 通过管理后台添加账号。
